@@ -57,3 +57,27 @@ func (h *authHandler) Register(c echo.Context) error {
 		"data":   user,
 	})
 }
+
+func (h *authHandler) Login(c echo.Context) error {
+	email := c.FormValue("email")
+	password := c.FormValue("password")
+
+	formData := model.UserLoginRequest{
+		Email:    email,
+		Password: password,
+	}
+
+	if err := c.Validate(&formData); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.LoginValidationErr, err.Error()))
+	}
+
+	resp, err := h.service.Login(formData)
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.LoginInternalErr, err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"status": "success",
+		"data":   resp,
+	})
+}

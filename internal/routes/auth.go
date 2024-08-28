@@ -14,4 +14,5 @@ func AuthRouter(e *echo.Echo) {
 	authHandler := handler.NewAuthHandler(authService)
 
 	e.POST("/users/register", authHandler.Register)
+	e.POST("/users/login", authHandler.Login)
 }

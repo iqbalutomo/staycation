@@ -18,3 +18,13 @@ type User struct {
 	Phone    string       `gorm:"size:14;unique;not null" json:"phone" validate:"required"`
 	Role     UserRoleEnum `gorm:"type:user_role_enum;not null" json:"role" validate:"required,oneof=customer hotel_owner"`
 }
+
+type UserLoginRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
+type LoginResponse struct {
+	User  *User  `json:"user"`
+	Token string `json:"token"`
+}

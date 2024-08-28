@@ -7,10 +7,16 @@ import (
 )
 
 const (
+	// REGISTER
 	RegisterValidationErr = "REGISTER_VALIDATION_ERROR"
 	RegisterEmailExist    = "REGISTER_EMAIL_EXIST"
 	RegisteerPhoneExist   = "REGISTER_PHONE_EXIST"
 	RegisterInternalErr   = "REGISTER_INTERNAL_ERROR"
+
+	// LOGIN
+	LoginValidationErr    = "LOGIN_VALIDATION_ERROR"
+	LoginEmailPassInvalid = "LOGIN_INVALID_EMAIL_PASSWORD"
+	LoginInternalErr      = "LOGIN_INTERNAL_ERROR"
 )
 
 type APIError struct {
