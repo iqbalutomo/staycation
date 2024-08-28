@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	model "staycation/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,5 +25,9 @@ func ConnectDB() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
+	}
+
+	if err := DB.AutoMigrate(&model.User{}); err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
 	}
 }
