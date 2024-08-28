@@ -17,6 +17,16 @@ const (
 	LoginValidationErr    = "LOGIN_VALIDATION_ERROR"
 	LoginEmailPassInvalid = "LOGIN_INVALID_EMAIL_PASSWORD"
 	LoginInternalErr      = "LOGIN_INTERNAL_ERROR"
+
+	// AUTH
+	Unauthorized      = "AUNAUTHORIZED"
+	InvalidCredential = "INVALID_CREDENTIALS"
+
+	// BALANCE
+	BalanceInvalidReqErr = "DEPOSIT_BAD_REQUEST"
+	BalanceInternalErr   = "DEPOSIT_INTERNAL_ERROR"
+	BalanceMinTopUp      = "MINIMAL_TOPUP"
+	BalanceMaxTopUp      = "MAXIMAL_TOPUP"
 )
 
 type APIError struct {

@@ -24,14 +24,18 @@ func NewAuthService(repo repository.UserRepository) AuthService {
 }
 
 func (s *authService) Register(req model.User) (*model.User, error) {
-	_, err := s.repo.FindByEmail(req.Email)
+	emailExist, err := s.repo.FindByEmail(req.Email)
 	if err != nil {
 		return nil, err
+	} else if emailExist != nil {
+		return nil, errors.New("email_exist")
 	}
 
-	_, err = s.repo.FindByPhone(req.Phone)
+	phoneExist, err := s.repo.FindByPhone(req.Phone)
 	if err != nil {
 		return nil, err
+	} else if phoneExist != nil {
+		return nil, errors.New("phone_exist")
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)

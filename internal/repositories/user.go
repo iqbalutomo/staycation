@@ -23,24 +23,28 @@ func NewUserRepository() UserRepository {
 }
 
 func (r *userRepo) Create(user *model.User) error {
-	result := r.db.Create(&user)
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&user).Error; err != nil {
+			return err
+		}
 
-	if result.Error != nil {
-		return result.Error
-	}
+		balance := model.Balance{
+			UserID: user.ID,
+		}
 
-	if result.RowsAffected == 0 {
-		return result.Error
-	}
+		if err := tx.Create(&balance).Error; err != nil {
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
 func (r *userRepo) FindByEmail(email string) (*model.User, error) {
 	var user model.User
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("email_exist")
+			return nil, nil
 		}
 
 		return nil, err
@@ -53,7 +57,7 @@ func (r *userRepo) FindByPhone(phone string) (*model.User, error) {
 	var user model.User
 	if err := r.db.Where("phone = ?", phone).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("phone_exist")
+			return nil, nil
 		}
 
 		return nil, err

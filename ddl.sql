@@ -12,6 +12,11 @@ CREATE TABLE users(
     role user_role_enum NOT NULL
 );
 
+CREATE TABLE deposits(
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    balance DECIMAL(10, 2) DEFAULT 0
+);
+
 CREATE TABLE hotels(
     id SERIAL PRIMARY KEY,
     owner_id INT REFERENCES users(id) ON DELETE CASCADE,
