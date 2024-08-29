@@ -11,6 +11,7 @@ import (
 type HotelRepository interface {
 	// HOTEL
 	CreateHotel(hotel *model.Hotel) error
+	UpdateHotel(hotel *model.Hotel) error
 	FindAllHotel(limit, offset int) ([]*model.Hotel, error)
 	FindHotelByEmail(email string) (*model.Hotel, error)
 	FindHotelByPhone(phone string) (*model.Hotel, error)
@@ -41,6 +42,14 @@ func (r *hotelRepo) CreateHotel(hotel *model.Hotel) error {
 
 	if result.RowsAffected == 0 {
 		return result.Error
+	}
+
+	return nil
+}
+
+func (r *hotelRepo) UpdateHotel(hotel *model.Hotel) error {
+	if err := r.db.Save(&hotel).Error; err != nil {
+		return err
 	}
 
 	return nil

@@ -93,6 +93,49 @@ func (h *hotelHandler) PostRoomType(c echo.Context) error {
 	})
 }
 
+func (h *hotelHandler) PutHotel(c echo.Context) error {
+	userClaims := c.Get("user").(jwt.MapClaims)
+	userID := userClaims["user_id"].(float64)
+	role := userClaims["role"].(string)
+
+	if role != "hotel_owner" {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "only user has owner hotel role"))
+	}
+
+	hotelID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	}
+
+	hotel, err := h.service.FindHotelByID(uint(hotelID))
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
+	}
+
+	if err := c.Bind(hotel); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	}
+
+	if err := c.Validate(hotel); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, err))
+	}
+
+	if err := utils.ValidatePhoneFormat(hotel.Phone); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.RegisterValidationErr, err))
+	}
+
+	updatedHotel, err := h.service.UpdateHotel(userID, hotel)
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"status": "success",
+		"data":   updatedHotel,
+	})
+
+}
+
 func (h *hotelHandler) PostRoom(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
 	userID := userClaims["user_id"].(float64)
