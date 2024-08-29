@@ -69,6 +69,15 @@ func (s *invoiceService) BookRoom(userID uint, email string, booking *model.Book
 	hotelID := roomType.HotelID
 	totalPrice := roomType.Price * float64(days)
 
+	balance, err := s.repoBalance.FindByUserID(userID)
+	if err != nil {
+		return nil, err
+	} else if balance == nil {
+		return nil, errors.New("balance_not_found")
+	} else if balance.Balance < totalPrice {
+		return nil, errors.New("insufficient_balance")
+	}
+
 	booking.UserID = userID
 	booking.HotelID = hotelID
 	booking.TotalPrice = totalPrice

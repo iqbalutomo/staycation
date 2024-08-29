@@ -24,6 +24,7 @@ const (
 
 	// BALANCE
 	BalanceInvalidReqErr = "DEPOSIT_BAD_REQUEST"
+	BalanceNotFound      = "DEPOSIT_NOT_FOUND"
 	BalanceInternalErr   = "DEPOSIT_INTERNAL_ERROR"
 	BalanceMinTopUp      = "MINIMAL_TOPUP"
 	BalanceMaxTopUp      = "MAXIMAL_TOPUP"
