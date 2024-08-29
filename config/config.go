@@ -19,8 +19,11 @@ func LoadEnv() error {
 }
 
 func InitConfig() {
-	if err := LoadEnv(); err != nil {
-		log.Fatalf("failed to load .env file: %v", err)
+	appEnv := os.Getenv("APP_ENV")
+	if appEnv == "development" {
+		if err := LoadEnv(); err != nil {
+			log.Fatalf("failed to load .env file: %v", err)
+		}
 	}
 
 	database.ConnectDB()
