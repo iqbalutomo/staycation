@@ -12,7 +12,7 @@ CREATE TABLE users(
     role user_role_enum NOT NULL
 );
 
-CREATE TABLE deposits(
+CREATE TABLE balances(
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     balance DECIMAL(10, 2) DEFAULT 0
 );
@@ -85,7 +85,8 @@ CREATE TABLE invoices(
 );
 
 CREATE TABLE payments(
-    invoice_id INT PRIMARY KEY REFERENCES invoices(booking_id) ON DELETE CASCADE,
+    id INT PRIMARY KEY,
+    invoice_id INT REFERENCES invoices(booking_id) ON DELETE CASCADE,
     payment_method TEXT NOT NULL,
     paid_amount DECIMAL(10, 2) NOT NULL,
     paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -86,6 +86,11 @@ Berikut adalah contoh yang telah disesuaikan dengan DDL yang kamu berikan:
 - `paid_amount` DECIMAL(10, 2) NOT NULL
 - `paid_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
+### j. Entity: balances
+##### Attributes:
+- `user_id` INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE
+- `balance` DECIMAL(10, 2) DEFAULT 0
+
 ---
 
 ## B. Relationships:
@@ -115,8 +120,12 @@ Berikut adalah contoh yang telah disesuaikan dengan DDL yang kamu berikan:
 - **Description:** Each booking has only one invoice, and each invoice is associated with only one booking.
 
 ### 7. invoices to payments
-- **Type:** One to One
-- **Description:** One invoice has only one payments, and each payment is associated with only one invoice.
+- **Type:** One to Many 
+- **Description:** One invoice can have many payments, but each payment is associated with only one invoice.
+
+### 8. users to balances
+- **Type:** One to One 
+- **Description:** One user has only one balance, and each balance is associated with only one user.
 
 ---
 
