@@ -129,3 +129,36 @@ func (h *hotelHandler) PostRoom(c echo.Context) error {
 		"data":   createdRoom,
 	})
 }
+
+func (h *hotelHandler) GetHotels(c echo.Context) error {
+	limitParam := c.QueryParam("limit")
+	offsetParam := c.QueryParam("offset")
+	limit := 10
+	offset := 0
+
+	if limitParam != "" {
+		parsedLimit, err := strconv.Atoi(limitParam)
+		if err != nil {
+			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+		}
+		limit = parsedLimit
+	}
+
+	if offsetParam != "" {
+		parsedOffset, err := strconv.Atoi(offsetParam)
+		if err != nil {
+			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+		}
+		offset = parsedOffset
+	}
+
+	respData, err := h.service.GetHotels(limit, offset)
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"status": "success",
+		"data":   respData,
+	})
+}

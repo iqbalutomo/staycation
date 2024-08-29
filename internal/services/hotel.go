@@ -8,6 +8,7 @@ import (
 
 type HotelService interface {
 	NewHotel(req *model.Hotel) (*model.Hotel, error)
+	GetHotels(limit, offset int) ([]*model.Hotel, error)
 	NewRoomType(userID float64, roomType *model.RoomType, bedType *model.RoomBedType, facilities *model.RoomFacilities) (*model.RoomTypeRequest, error)
 	NewRoom(userID float64, req *model.Room) (*model.Room, error)
 }
@@ -40,6 +41,15 @@ func (s *hotelService) NewHotel(req *model.Hotel) (*model.Hotel, error) {
 	}
 
 	return req, nil
+}
+
+func (s *hotelService) GetHotels(limit, offset int) ([]*model.Hotel, error) {
+	hotels, err := s.repo.FindAllHotel(limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	return hotels, nil
 }
 
 func (s *hotelService) NewRoomType(userID float64, roomType *model.RoomType, bedType *model.RoomBedType, facilities *model.RoomFacilities) (*model.RoomTypeRequest, error) {

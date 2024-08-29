@@ -17,4 +17,5 @@ func HotelRouter(e *echo.Echo) {
 	e.POST("/hotels", hotelHandler.PostHotel, middlewares.ProtectedRoute)
 	e.POST("/hotels/:hotel-id/roomtypes", hotelHandler.PostRoomType, middlewares.ProtectedRoute)
 	e.POST("/hotels/:roomtype-id/room", hotelHandler.PostRoom, middlewares.ProtectedRoute)
+	e.GET("/hotels", hotelHandler.GetHotels)
 }

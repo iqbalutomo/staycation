@@ -11,6 +11,7 @@ import (
 type HotelRepository interface {
 	// HOTEL
 	CreateHotel(hotel *model.Hotel) error
+	FindAllHotel(limit, offset int) ([]*model.Hotel, error)
 	FindHotelByEmail(email string) (*model.Hotel, error)
 	FindHotelByPhone(phone string) (*model.Hotel, error)
 	FindHotelByID(hotelID uint) (*model.Hotel, error)
@@ -43,6 +44,15 @@ func (r *hotelRepo) CreateHotel(hotel *model.Hotel) error {
 	}
 
 	return nil
+}
+
+func (r *hotelRepo) FindAllHotel(limit, offset int) ([]*model.Hotel, error) {
+	var hotels []*model.Hotel
+	if err := r.db.Limit(limit).Offset(offset).Find(&hotels).Error; err != nil {
+		return nil, err
+	}
+
+	return hotels, nil
 }
 
 func (r *hotelRepo) FindHotelByEmail(email string) (*model.Hotel, error) {
