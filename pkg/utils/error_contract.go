@@ -27,6 +27,13 @@ const (
 	BalanceInternalErr   = "DEPOSIT_INTERNAL_ERROR"
 	BalanceMinTopUp      = "MINIMAL_TOPUP"
 	BalanceMaxTopUp      = "MAXIMAL_TOPUP"
+
+	// HOTEL
+	HotelBadRequestErr = "HOTEL_BAD_REQUEST"
+	HotelValidationErr = "HOTEL_VALIDATION_ERROR"
+	HotelInternalErr   = "HOTEL_INTERNAL_ERROR"
+	HotelEmailExist    = "HOTEL_EMAIL_EXIST"
+	HotelPhoneExist    = "HOTEL_PHONE_EXIST"
 )
 
 type APIError struct {

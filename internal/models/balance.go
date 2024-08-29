@@ -12,5 +12,6 @@ type Balance struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	User      User           `gorm:"foreignKey:UserID"`
+
+	User User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }

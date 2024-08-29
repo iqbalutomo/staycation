@@ -15,8 +15,12 @@ type CustomValidator struct {
 
 func (cv *CustomValidator) Validate(i interface{}) error {
 	if err := cv.Validator.Struct(i); err != nil {
-		errMap := make(map[string]string)
+		// check err is validator invalid
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return echo.NewHTTPError(http.StatusBadRequest, "invalid validation input")
+		}
 
+		errMap := make(map[string]string)
 		for _, err := range err.(validator.ValidationErrors) {
 			field := strings.ToLower(err.Field())
 			switch err.Tag() {

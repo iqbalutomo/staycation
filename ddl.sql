@@ -48,7 +48,7 @@ CREATE TABLE room_bed_types(
     king_bed INT DEFAULT 0
 );
 
-CREATE TABLE room_facilites(
+CREATE TABLE room_facilities(
     room_type_id INT PRIMARY KEY REFERENCES room_types(id) ON DELETE CASCADE,
     has_shower BOOLEAN DEFAULT FALSE,
     has_refrigerator BOOLEAN DEFAULT FALSE,

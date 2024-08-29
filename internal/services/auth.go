@@ -71,6 +71,7 @@ func (s *authService) Login(req model.UserLoginRequest) (*model.LoginResponse, e
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
+		"role":    user.Role,
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))
