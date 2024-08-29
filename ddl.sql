@@ -80,6 +80,7 @@ CREATE TABLE bookings(
 CREATE TABLE invoices(
     booking_id INT PRIMARY KEY REFERENCES bookings(id) ON DELETE CASCADE,
     xendit_invoice_id TEXT NOT NULL,
+    invoice_url TEXT NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     status invoice_status_enum DEFAULT 'PENDING'
 );

@@ -47,6 +47,18 @@ const (
 	RoomNotFound      = "ROOM_NOT_FOUND"
 	RoomValidationErr = "ROOM_VALIDATION_ERROR"
 	RoomInternalErr   = "ROOM_INTERNAL_ERROR"
+
+	// BOOKING
+	BookingBadRequestErr = "BOOKING_BAD_REQUEST"
+	BookingNotFound      = "BOOKING_NOT_FOUND"
+	BookingValidationErr = "BOOKING_VALIDATION_ERROR"
+	BookingInternalErr   = "BOOKING_INTERNAL_ERROR"
+
+	// INVOICE
+	InvoiceBadRequestErr = "INVOICE_BAD_REQUEST"
+	InvoiceNotFound      = "INVOICE_NOT_FOUND"
+	InvoiceValidationErr = "INVOICE_VALIDATION_ERROR"
+	InvoiceInternalErr   = "INVOICE_INTERNAL_ERROR"
 )
 
 type APIError struct {

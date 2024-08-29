@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	model "staycation/internal/models"
 	database "staycation/pkg/databases"
 
@@ -9,6 +10,8 @@ import (
 
 type BalanceRepository interface {
 	AddBalance(userID int, amount float64) error
+	FindByUserID(userID uint) (*model.Balance, error)
+	Update(balance *model.Balance) error
 }
 
 type balanceRepo struct {
@@ -31,5 +34,23 @@ func (r *balanceRepo) AddBalance(userID int, amount float64) error {
 		return err
 	}
 
+	return nil
+}
+
+func (r *balanceRepo) FindByUserID(userID uint) (*model.Balance, error) {
+	var balance model.Balance
+	if err := r.db.Where("user_id = ?", userID).First(&balance).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &balance, nil
+}
+
+func (r *balanceRepo) Update(balance *model.Balance) error {
+	if err := r.db.Save(balance).Error; err != nil {
+		return err
+	}
 	return nil
 }

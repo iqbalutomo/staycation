@@ -2,12 +2,15 @@ package service
 
 import (
 	"errors"
+	"log"
 	model "staycation/internal/models"
 	repository "staycation/internal/repositories"
+	"time"
 )
 
 type RoomService interface {
 	CreateRoom(userID float64, req *model.Room) (*model.Room, error)
+	UpdateRoomStatus() error
 }
 
 type roomService struct {
@@ -54,4 +57,20 @@ func (s *roomService) CreateRoom(userID float64, req *model.Room) (*model.Room, 
 	}
 
 	return room, nil
+}
+
+func (s *roomService) UpdateRoomStatus() error {
+	rooms, err := s.repoRoom.FindRoomsToUpdate(time.Now())
+	if err != nil {
+		return err
+	}
+
+	for _, room := range rooms {
+		room.Status = "available"
+		if err := s.repoRoom.UpdateRoom(&room); err != nil {
+			log.Printf("Failed to update room %d: %v", room.ID, err)
+		}
+	}
+
+	return nil
 }

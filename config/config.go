@@ -8,16 +8,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Config struct {
+var (
 	Port         string
 	XenditAPIKey string
-}
+	XenditAPIURL string
+)
 
 func LoadEnv() error {
 	return godotenv.Load()
 }
 
-func InitConfig() *Config {
+func InitConfig() {
 	if err := LoadEnv(); err != nil {
 		log.Fatalf("failed to load .env file: %v", err)
 	}
@@ -29,8 +30,7 @@ func InitConfig() *Config {
 		port = "8080"
 	}
 
-	return &Config{
-		Port:         port,
-		XenditAPIKey: os.Getenv("XENDIT_API_KEY"),
-	}
+	Port = port
+	XenditAPIKey = os.Getenv("XENDIT_API_KEY")
+	XenditAPIURL = os.Getenv("XENDIT_API_URL")
 }

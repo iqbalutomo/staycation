@@ -3,7 +3,9 @@ package main
 import (
 	"net/http"
 	"staycation/config"
+	repository "staycation/internal/repositories"
 	route "staycation/internal/routes"
+	service "staycation/internal/services"
 	"staycation/pkg/utils"
 
 	"github.com/go-playground/validator/v10"
@@ -12,7 +14,7 @@ import (
 )
 
 func main() {
-	cfg := config.InitConfig()
+	config.InitConfig()
 
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -20,6 +22,14 @@ func main() {
 
 	v := validator.New()
 	e.Validator = &utils.CustomValidator{Validator: v}
+
+	roomRepo := repository.NewRoomRepository()
+	roomTypeRepo := repository.NewRoomTypeRepository()
+	hotelRepo := repository.NewHotelRepository()
+	roomService := service.NewRoomService(roomRepo, roomTypeRepo, hotelRepo)
+
+	cronJobService := utils.NewCronJobService(roomService)
+	cronJobService.Start()
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, echo.Map{
@@ -29,5 +39,5 @@ func main() {
 
 	route.MainRouter(e)
 
-	e.Logger.Fatal(e.Start(":" + cfg.Port))
+	e.Logger.Fatal(e.Start(":" + config.Port))
 }
