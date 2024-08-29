@@ -70,11 +70,11 @@ type RoomFacilities struct {
 
 type Room struct {
 	gorm.Model
-	RoomTypeID uint           `gorm:"not null"`
-	RoomNumber int            `gorm:"not null"`
+	RoomTypeID uint           `gorm:"not null" json:"room_type_id" validate:"required"`
+	RoomNumber int            `gorm:"not null" json:"room_number" validate:"required"`
 	Status     RoomStatusEnum `gorm:"type:room_status_enum;default:'available'"`
 
-	RoomType RoomType `gorm:"foreignKey:RoomTypeID;constraint:OnDelete:CASCADE;"`
+	RoomType RoomType `gorm:"foreignKey:RoomTypeID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
 }
 
 type RoomTypeRequest struct {

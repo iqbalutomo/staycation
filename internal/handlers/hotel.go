@@ -92,3 +92,40 @@ func (h *hotelHandler) PostRoomType(c echo.Context) error {
 		"data":   createdRoomType,
 	})
 }
+
+func (h *hotelHandler) PostRoom(c echo.Context) error {
+	userClaims := c.Get("user").(jwt.MapClaims)
+	userID := userClaims["user_id"].(float64)
+	role := userClaims["role"].(string)
+
+	reqBody := new(model.Room)
+
+	roomTypeID, err := strconv.Atoi(c.Param("roomtype-id"))
+	if err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	}
+
+	if err := c.Bind(reqBody); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	}
+
+	reqBody.RoomTypeID = uint(roomTypeID)
+
+	if err := c.Validate(reqBody); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
+	}
+
+	if role != "hotel_owner" {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "only user has owner hotel role"))
+	}
+
+	createdRoom, err := h.service.NewRoom(userID, reqBody)
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
+	}
+
+	return c.JSON(http.StatusCreated, echo.Map{
+		"status": "success",
+		"data":   createdRoom,
+	})
+}

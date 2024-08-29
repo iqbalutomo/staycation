@@ -17,6 +17,10 @@ type HotelRepository interface {
 
 	// ROOM TYPE
 	CreateRoomType(roomType *model.RoomType, bedType *model.RoomBedType, facilities *model.RoomFacilities) (*model.RoomTypeRequest, error)
+	FindRoomTypelByID(roomTypeID uint) (*model.RoomType, error)
+
+	// ROOM
+	CreateRoom(room *model.Room) error
 }
 
 type hotelRepo struct {
@@ -109,4 +113,31 @@ func (r *hotelRepo) CreateRoomType(roomType *model.RoomType, bedType *model.Room
 	}
 
 	return &respData, nil
+}
+
+func (r *hotelRepo) FindRoomTypelByID(roomTypeID uint) (*model.RoomType, error) {
+	var roomtype model.RoomType
+	if err := r.db.Where("id = ?", roomTypeID).First(&roomtype).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &roomtype, nil
+}
+
+func (r *hotelRepo) CreateRoom(room *model.Room) error {
+	result := r.db.Create(&room)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return result.Error
+	}
+
+	return nil
 }
