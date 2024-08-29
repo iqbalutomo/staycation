@@ -14,5 +14,6 @@ func HotelRouter(e *echo.Echo) {
 	hotelService := service.NewHotelService(hotelRepo)
 	hotelHandler := handler.NewHotelHandler(hotelService)
 
-	e.POST("/hotel", hotelHandler.PostHotel, middlewares.ProtectedRoute)
+	e.POST("/hotels", hotelHandler.PostHotel, middlewares.ProtectedRoute)
+	e.POST("/hotels/:hotel-id/roomtypes", hotelHandler.PostRoomType, middlewares.ProtectedRoute)
 }

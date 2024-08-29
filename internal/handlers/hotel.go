@@ -5,6 +5,7 @@ import (
 	model "staycation/internal/models"
 	service "staycation/internal/services"
 	"staycation/pkg/utils"
+	"strconv"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
@@ -52,5 +53,42 @@ func (h *hotelHandler) PostHotel(c echo.Context) error {
 	return c.JSON(http.StatusCreated, echo.Map{
 		"status": "success",
 		"data":   createdHotel,
+	})
+}
+
+func (h *hotelHandler) PostRoomType(c echo.Context) error {
+	userClaims := c.Get("user").(jwt.MapClaims)
+	userID := userClaims["user_id"].(float64)
+	role := userClaims["role"].(string)
+
+	reqBody := new(model.RoomTypeRequest)
+
+	hotelID, err := strconv.Atoi(c.Param("hotel-id"))
+	if err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	}
+
+	if err := c.Bind(reqBody); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	}
+
+	reqBody.RoomType.HotelID = uint(hotelID)
+
+	if err := c.Validate(reqBody); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
+	}
+
+	if role != "hotel_owner" {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "only user has owner hotel role"))
+	}
+
+	createdRoomType, err := h.service.NewRoomType(userID, &reqBody.RoomType, &reqBody.RoomBedType, &reqBody.RoomFacilities)
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
+	}
+
+	return c.JSON(http.StatusCreated, echo.Map{
+		"status": "success",
+		"data":   createdRoomType,
 	})
 }

@@ -16,7 +16,6 @@ const (
 
 type Hotel struct {
 	gorm.Model
-	// ID       uint         `gorm:"primaryKey" json:"id"`
 	OwnerID     uint   `gorm:"not null" json:"owner_id" validate:"required"`
 	Name        string `gorm:"size:100;not null" json:"name" validate:"required"`
 	Description string `gorm:"type:text" json:"description"`
@@ -32,13 +31,13 @@ type Hotel struct {
 type RoomType struct {
 	gorm.Model
 	HotelID     uint    `gorm:"not null" json:"hotel_id" validate:"required"`
-	Name        string  `gorm:"size:100;not null" json:"name" validate:"required,min=1,max=100"`
+	Name        string  `gorm:"size:100;not null" json:"name" validate:"required"`
 	Description string  `gorm:"type:text" json:"description"`
-	Price       float64 `gorm:"type:decimal(10,2);check:price >= 0;not null" json:"price" validate:"required,gt=0"`
-	RoomSize    float64 `gorm:"type:decimal(4,1);not null" json:"room_size" validate:"required,gt=0"`
-	Guest       int     `gorm:"check:guest >= 1;not null" json:"guest" validate:"required,gt=0"`
+	Price       float64 `gorm:"type:decimal(10,2);check:price >= 0;not null" json:"price" validate:"required"`
+	RoomSize    float64 `gorm:"type:decimal(4,1);not null" json:"room_size" validate:"required"`
+	Guest       int     `gorm:"check:guest >= 1;not null" json:"guest" validate:"required"`
 
-	Hotel Hotel `gorm:"foreignKey:HotelID;constraint:OnDelete:CASCADE;" json:"-"`
+	Hotel Hotel `gorm:"foreignKey:HotelID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
 }
 
 type RoomBedType struct {
@@ -50,7 +49,7 @@ type RoomBedType struct {
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
 
-	RoomType RoomType `gorm:"foreignKey:RoomTypeID;constraint:OnDelete:CASCADE;" json:"-"`
+	RoomType RoomType `gorm:"foreignKey:RoomTypeID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
 }
 
 type RoomFacilities struct {
@@ -66,7 +65,7 @@ type RoomFacilities struct {
 	UpdatedAt       time.Time
 	DeletedAt       gorm.DeletedAt `gorm:"index"`
 
-	RoomType RoomType `gorm:"foreignKey:RoomTypeID;constraint:OnDelete:CASCADE;" json:"-"`
+	RoomType RoomType `gorm:"foreignKey:RoomTypeID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
 }
 
 type Room struct {
@@ -76,4 +75,10 @@ type Room struct {
 	Status     RoomStatusEnum `gorm:"type:room_status_enum;default:'available'"`
 
 	RoomType RoomType `gorm:"foreignKey:RoomTypeID;constraint:OnDelete:CASCADE;"`
+}
+
+type RoomTypeRequest struct {
+	RoomType       RoomType       `json:"room_type"`
+	RoomBedType    RoomBedType    `json:"room_bed_type"`
+	RoomFacilities RoomFacilities `json:"room_facilities"`
 }
