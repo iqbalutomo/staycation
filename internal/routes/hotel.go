@@ -16,6 +16,7 @@ func HotelRouter(e *echo.Echo) {
 
 	e.POST("/hotels", hotelHandler.PostHotel, middlewares.ProtectedRoute)
 	e.PUT("/hotels/:id", hotelHandler.PutHotel, middlewares.ProtectedRoute)
+	e.DELETE("/hotels/:id", hotelHandler.DeleteHotel, middlewares.ProtectedRoute)
 
 	e.POST("/hotels/:hotel-id/roomtypes", hotelHandler.PostRoomType, middlewares.ProtectedRoute)
 	e.POST("/hotels/:roomtype-id/room", hotelHandler.PostRoom, middlewares.ProtectedRoute)

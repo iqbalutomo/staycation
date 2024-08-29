@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	model "staycation/internal/models"
 	service "staycation/internal/services"
@@ -134,6 +135,36 @@ func (h *hotelHandler) PutHotel(c echo.Context) error {
 		"data":   updatedHotel,
 	})
 
+}
+
+func (h *hotelHandler) DeleteHotel(c echo.Context) error {
+	userClaims := c.Get("user").(jwt.MapClaims)
+	userID := userClaims["user_id"].(float64)
+
+	hotelID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	}
+
+	hotel, err := h.service.FindHotelByID(uint(hotelID))
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
+	} else if hotel == nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "hotel not found"))
+	}
+
+	if hotel.OwnerID != uint(userID) {
+		return utils.HandleError(c, utils.NewUnauthorizedError(utils.HotelBadRequestErr, "Unauthorized"))
+	}
+
+	if err := h.service.DeleteHotel(hotelID); err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"status":  "success",
+		"message": fmt.Sprintf("hotel with id %d has been deleted temporary", hotel.ID),
+	})
 }
 
 func (h *hotelHandler) PostRoom(c echo.Context) error {

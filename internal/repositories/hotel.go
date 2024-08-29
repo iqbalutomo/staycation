@@ -11,8 +11,10 @@ import (
 type HotelRepository interface {
 	// HOTEL
 	CreateHotel(hotel *model.Hotel) error
-	UpdateHotel(hotel *model.Hotel) error
 	FindAllHotel(limit, offset int) ([]*model.Hotel, error)
+	UpdateHotel(hotel *model.Hotel) error
+	DeleteHotel(hotelID int) error
+
 	FindHotelByEmail(email string) (*model.Hotel, error)
 	FindHotelByPhone(phone string) (*model.Hotel, error)
 	FindHotelByID(hotelID uint) (*model.Hotel, error)
@@ -62,6 +64,15 @@ func (r *hotelRepo) FindAllHotel(limit, offset int) ([]*model.Hotel, error) {
 	}
 
 	return hotels, nil
+}
+
+func (r *hotelRepo) DeleteHotel(hotelID int) error {
+	var hotel model.Hotel
+	if err := r.db.Where("id = ?", hotelID).Delete(&hotel).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *hotelRepo) FindHotelByEmail(email string) (*model.Hotel, error) {

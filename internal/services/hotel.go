@@ -11,6 +11,7 @@ type HotelService interface {
 	UpdateHotel(userID float64, hotel *model.Hotel) (*model.Hotel, error)
 	FindHotelByID(hotelID uint) (*model.Hotel, error)
 	GetHotels(limit, offset int) ([]*model.Hotel, error)
+	DeleteHotel(hotelID int) error
 	NewRoomType(userID float64, roomType *model.RoomType, bedType *model.RoomBedType, facilities *model.RoomFacilities) (*model.RoomTypeRequest, error)
 	NewRoom(userID float64, req *model.Room) (*model.Room, error)
 }
@@ -64,6 +65,14 @@ func (s *hotelService) FindHotelByID(hotelID uint) (*model.Hotel, error) {
 	}
 
 	return hotel, nil
+}
+
+func (s *hotelService) DeleteHotel(hotelID int) error {
+	if err := s.repo.DeleteHotel(hotelID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *hotelService) GetHotels(limit, offset int) ([]*model.Hotel, error) {
