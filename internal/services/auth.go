@@ -61,11 +61,11 @@ func (s *authService) Register(req model.User) (*model.User, error) {
 func (s *authService) Login(req model.UserLoginRequest) (*model.LoginResponse, error) {
 	user, err := s.repo.FindByEmail(req.Email)
 	if err != nil {
-		return nil, errors.New("invalid email or password")
+		return nil, errors.New("invalid_emailorpassword")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return nil, errors.New("invalid email or password")
+		return nil, errors.New("invalid_emailorpassword")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

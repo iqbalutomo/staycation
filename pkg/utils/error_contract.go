@@ -30,10 +30,23 @@ const (
 
 	// HOTEL
 	HotelBadRequestErr = "HOTEL_BAD_REQUEST"
+	HotelNotFound      = "HOTEL_NOT_FOUND"
 	HotelValidationErr = "HOTEL_VALIDATION_ERROR"
 	HotelInternalErr   = "HOTEL_INTERNAL_ERROR"
 	HotelEmailExist    = "HOTEL_EMAIL_EXIST"
 	HotelPhoneExist    = "HOTEL_PHONE_EXIST"
+
+	// ROOM TYPE
+	RoomTypeBadRequestErr = "ROOM_TYPE_BAD_REQUEST"
+	RoomTypeNotFound      = "ROOM_TYPE_NOT_FOUND"
+	RoomTypeValidationErr = "ROOM_TYPE_VALIDATION_ERROR"
+	RoomTypeInternalErr   = "ROOM_TYPE_INTERNAL_ERROR"
+
+	// ROOM
+	RoomBadRequestErr = "ROOM_BAD_REQUEST"
+	RoomNotFound      = "ROOM_NOT_FOUND"
+	RoomValidationErr = "ROOM_VALIDATION_ERROR"
+	RoomInternalErr   = "ROOM_INTERNAL_ERROR"
 )
 
 type APIError struct {

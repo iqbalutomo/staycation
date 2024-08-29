@@ -73,6 +73,9 @@ func (h *authHandler) Login(c echo.Context) error {
 
 	resp, err := h.service.Login(formData)
 	if err != nil {
+		if err.Error() == "invalid_emailorpassword" {
+			return utils.HandleError(c, utils.NewBadRequestError(utils.LoginEmailPassInvalid, "invalid email or password"))
+		}
 		return utils.HandleError(c, utils.NewInternalError(utils.LoginInternalErr, err.Error()))
 	}
 

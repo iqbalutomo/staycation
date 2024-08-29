@@ -25,9 +25,13 @@ func (h *hotelHandler) PostHotel(c echo.Context) error {
 	userID := userClaims["user_id"].(float64)
 	role := userClaims["role"].(string)
 
+	if role != "hotel_owner" {
+		return utils.HandleError(c, utils.NewUnauthorizedError(utils.InvalidCredential, "only user has owner hotel role"))
+	}
+
 	hotel := new(model.Hotel)
 	if err := c.Bind(hotel); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid body request"))
 	}
 
 	hotel.OwnerID = uint(userID)
@@ -36,17 +40,17 @@ func (h *hotelHandler) PostHotel(c echo.Context) error {
 		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
 	}
 
-	if role != "hotel_owner" {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "only user has owner hotel role"))
+	if err := utils.ValidatePhoneFormat(hotel.Phone); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
 	}
 
-	createdHotel, err := h.service.NewHotel(hotel)
+	createdHotel, err := h.service.CreateHotel(hotel)
 	if err != nil {
 		if err.Error() == "email_exist" {
-			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelEmailExist, "email already axist."))
+			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelEmailExist, "email already axist"))
 		}
 		if err.Error() == "phone_exist" {
-			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelPhoneExist, "phone number already exist."))
+			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelPhoneExist, "phone number already exist"))
 		}
 		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
 	}
@@ -57,40 +61,36 @@ func (h *hotelHandler) PostHotel(c echo.Context) error {
 	})
 }
 
-func (h *hotelHandler) PostRoomType(c echo.Context) error {
-	userClaims := c.Get("user").(jwt.MapClaims)
-	userID := userClaims["user_id"].(float64)
-	role := userClaims["role"].(string)
+func (h *hotelHandler) GetHotels(c echo.Context) error {
+	limitParam := c.QueryParam("limit")
+	offsetParam := c.QueryParam("offset")
+	limit := 10
+	offset := 0
 
-	reqBody := new(model.RoomTypeRequest)
-
-	hotelID, err := strconv.Atoi(c.Param("hotel-id"))
-	if err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	if limitParam != "" {
+		parsedLimit, err := strconv.Atoi(limitParam)
+		if err != nil {
+			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid limit query param"))
+		}
+		limit = parsedLimit
 	}
 
-	if err := c.Bind(reqBody); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+	if offsetParam != "" {
+		parsedOffset, err := strconv.Atoi(offsetParam)
+		if err != nil {
+			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid offset query param"))
+		}
+		offset = parsedOffset
 	}
 
-	reqBody.RoomType.HotelID = uint(hotelID)
-
-	if err := c.Validate(reqBody); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
-	}
-
-	if role != "hotel_owner" {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "only user has owner hotel role"))
-	}
-
-	createdRoomType, err := h.service.NewRoomType(userID, &reqBody.RoomType, &reqBody.RoomBedType, &reqBody.RoomFacilities)
+	respData, err := h.service.GetHotels(limit, offset)
 	if err != nil {
 		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, echo.Map{
+	return c.JSON(http.StatusOK, echo.Map{
 		"status": "success",
-		"data":   createdRoomType,
+		"data":   respData,
 	})
 }
 
@@ -100,33 +100,42 @@ func (h *hotelHandler) PutHotel(c echo.Context) error {
 	role := userClaims["role"].(string)
 
 	if role != "hotel_owner" {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "only user has owner hotel role"))
+		return utils.HandleError(c, utils.NewUnauthorizedError(utils.InvalidCredential, "only user has owner hotel role"))
 	}
 
 	hotelID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid hotel id param"))
 	}
 
 	hotel, err := h.service.FindHotelByID(uint(hotelID))
 	if err != nil {
+		if err.Error() == "hotel_not_found" {
+			return utils.HandleError(c, utils.NewNotFoundError(utils.HotelNotFound, "hotel not found"))
+		}
 		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
 	}
 
 	if err := c.Bind(hotel); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid body request"))
 	}
 
 	if err := c.Validate(hotel); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, err))
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
 	}
 
 	if err := utils.ValidatePhoneFormat(hotel.Phone); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.RegisterValidationErr, err))
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
 	}
 
 	updatedHotel, err := h.service.UpdateHotel(userID, hotel)
 	if err != nil {
+		if err.Error() == "invalid_credentials" {
+			return utils.HandleError(c, utils.NewUnauthorizedError(utils.Unauthorized, "invalid credentials"))
+		}
+		if err.Error() == "hotel_not_found" {
+			return utils.HandleError(c, utils.NewNotFoundError(utils.HotelNotFound, "hotel not found"))
+		}
 		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
 	}
 
@@ -143,18 +152,18 @@ func (h *hotelHandler) DeleteHotel(c echo.Context) error {
 
 	hotelID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
+		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid hotel id param"))
 	}
 
 	hotel, err := h.service.FindHotelByID(uint(hotelID))
 	if err != nil {
 		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
 	} else if hotel == nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "hotel not found"))
+		return utils.HandleError(c, utils.NewNotFoundError(utils.HotelNotFound, "hotel not found"))
 	}
 
 	if hotel.OwnerID != uint(userID) {
-		return utils.HandleError(c, utils.NewUnauthorizedError(utils.HotelBadRequestErr, "Unauthorized"))
+		return utils.HandleError(c, utils.NewUnauthorizedError(utils.Unauthorized, "invalid credentials"))
 	}
 
 	if err := h.service.DeleteHotel(hotelID); err != nil {
@@ -164,75 +173,5 @@ func (h *hotelHandler) DeleteHotel(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"status":  "success",
 		"message": fmt.Sprintf("hotel with id %d has been deleted temporary", hotel.ID),
-	})
-}
-
-func (h *hotelHandler) PostRoom(c echo.Context) error {
-	userClaims := c.Get("user").(jwt.MapClaims)
-	userID := userClaims["user_id"].(float64)
-	role := userClaims["role"].(string)
-
-	reqBody := new(model.Room)
-
-	roomTypeID, err := strconv.Atoi(c.Param("roomtype-id"))
-	if err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
-	}
-
-	if err := c.Bind(reqBody); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
-	}
-
-	reqBody.RoomTypeID = uint(roomTypeID)
-
-	if err := c.Validate(reqBody); err != nil {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelValidationErr, err))
-	}
-
-	if role != "hotel_owner" {
-		return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "only user has owner hotel role"))
-	}
-
-	createdRoom, err := h.service.NewRoom(userID, reqBody)
-	if err != nil {
-		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
-	}
-
-	return c.JSON(http.StatusCreated, echo.Map{
-		"status": "success",
-		"data":   createdRoom,
-	})
-}
-
-func (h *hotelHandler) GetHotels(c echo.Context) error {
-	limitParam := c.QueryParam("limit")
-	offsetParam := c.QueryParam("offset")
-	limit := 10
-	offset := 0
-
-	if limitParam != "" {
-		parsedLimit, err := strconv.Atoi(limitParam)
-		if err != nil {
-			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
-		}
-		limit = parsedLimit
-	}
-
-	if offsetParam != "" {
-		parsedOffset, err := strconv.Atoi(offsetParam)
-		if err != nil {
-			return utils.HandleError(c, utils.NewBadRequestError(utils.HotelBadRequestErr, "invalid request"))
-		}
-		offset = parsedOffset
-	}
-
-	respData, err := h.service.GetHotels(limit, offset)
-	if err != nil {
-		return utils.HandleError(c, utils.NewInternalError(utils.HotelInternalErr, err.Error()))
-	}
-
-	return c.JSON(http.StatusOK, echo.Map{
-		"status": "success",
-		"data":   respData,
 	})
 }

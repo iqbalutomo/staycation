@@ -42,7 +42,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 }
 
 func ValidatePhoneFormat(phone string) error {
-	phoneRegex := `^(\+62|62|0)8[1-9][0-9]{6,9}$`
+	phoneRegex := `^(\+62|62|0)[1-9][0-9]{6,9}$`
 	if !regexp.MustCompile(phoneRegex).MatchString(phone) {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid phone number format.")
 	}
