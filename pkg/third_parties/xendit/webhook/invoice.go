@@ -2,9 +2,11 @@ package webhook
 
 import (
 	"net/http"
+	model "staycation/internal/models"
 	repository "staycation/internal/repositories"
-	model "staycation/pkg/third_parties/xendit/models"
+	model_xendit "staycation/pkg/third_parties/xendit/models"
 	"staycation/pkg/utils"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -20,7 +22,7 @@ func NewXenditWebhookHandler(InvoiceRepo repository.InvoiceRepository, BalanceRe
 }
 
 func (h *XenditWebhookHandler) InvoiceWebhook(c echo.Context) error {
-	payload := new(model.XenditInvoiceWebhookPayload)
+	payload := new(model_xendit.XenditInvoiceWebhookPayload)
 	if err := c.Bind(payload); err != nil {
 		return utils.HandleError(c, utils.NewBadRequestError(utils.InvoiceBadRequestErr, "invalid body request"))
 	}
@@ -67,6 +69,21 @@ func (h *XenditWebhookHandler) InvoiceWebhook(c echo.Context) error {
 	hotelBalance.Balance += booking.TotalPrice
 	if err := h.BalanceRepo.Update(hotelBalance); err != nil {
 		return utils.HandleError(c, utils.NewInternalError(utils.BalanceInternalErr, err.Error()))
+	}
+
+	paidAt, err := time.Parse(time.RFC3339, payload.PaidAt)
+	if err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(utils.InvoiceBadRequestErr, "invalid time format"))
+	}
+
+	payment := &model.Payment{
+		InvoiceID:     invoice.BookingID,
+		PaymentMethod: payload.PaymentMethod,
+		PaidAmount:    payload.PaidAmount,
+		PaidAt:        paidAt,
+	}
+	if err := h.InvoiceRepo.CreatePayment(payment); err != nil {
+		return utils.HandleError(c, utils.NewInternalError(utils.PaymentInternalErr, err.Error()))
 	}
 
 	return c.String(http.StatusOK, "thanks mate to the paid.... [holy insane🥷🏼]")

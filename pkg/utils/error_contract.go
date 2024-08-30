@@ -60,6 +60,9 @@ const (
 	InvoiceNotFound      = "INVOICE_NOT_FOUND"
 	InvoiceValidationErr = "INVOICE_VALIDATION_ERROR"
 	InvoiceInternalErr   = "INVOICE_INTERNAL_ERROR"
+
+	// PAYMENT
+	PaymentInternalErr = "PAYMENT_INTERNAL_ERROR"
 )
 
 type APIError struct {

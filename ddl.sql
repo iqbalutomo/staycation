@@ -86,10 +86,10 @@ CREATE TABLE invoices(
 );
 
 CREATE TABLE payments(
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     invoice_id INT REFERENCES invoices(booking_id) ON DELETE CASCADE,
     payment_method TEXT NOT NULL,
     paid_amount DECIMAL(10, 2) NOT NULL,
-    paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    paid_at TEXT NOT NULL
 );
 

@@ -16,6 +16,8 @@ type InvoiceRepository interface {
 	CreateInvoice(invoice *model.Invoice) error
 	FindInvoiceByID(id string) (*model.Invoice, error)
 	UpdateInvoiceStatus(id uint, status string) error
+
+	CreatePayment(payment *model.Payment) error
 }
 
 type invoiceRepo struct {
@@ -60,4 +62,8 @@ func (r *invoiceRepo) FindInvoiceByID(id string) (*model.Invoice, error) {
 
 func (r *invoiceRepo) UpdateInvoiceStatus(id uint, status string) error {
 	return r.db.Model(&model.Invoice{}).Where("booking_id = ?", id).Update("status", status).Error
+}
+
+func (r *invoiceRepo) CreatePayment(payment *model.Payment) error {
+	return r.db.Create(payment).Error
 }

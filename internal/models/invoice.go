@@ -33,10 +33,10 @@ type Invoice struct {
 
 type Payment struct {
 	gorm.Model
-	InvoiceID     uint      `gorm:"not null" json:"invoice_id" validate:"requried"`
+	InvoiceID     uint      `gorm:"not null" json:"invoice_id" validate:"required"`
 	PaymentMethod string    `gorm:"not null" json:"payment_method" validate:"required"`
 	PaidAmount    float64   `gorm:"not null" json:"paid_amount" validate:"required"`
-	PaidAt        time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"paid_at"`
+	PaidAt        time.Time `gorm:"not null" json:"paid_at"`
 
 	Invoice Invoice `gorm:"foreignKey:InvoiceID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
 }
