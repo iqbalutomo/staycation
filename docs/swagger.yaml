@@ -1,0 +1,284 @@
+definitions:
+  model.Booking:
+    properties:
+      check_in_date:
+        type: string
+      check_out_date:
+        type: string
+      hotel_id:
+        type: integer
+      id:
+        description: gorm.Model
+        type: integer
+      room_id:
+        type: integer
+      status:
+        type: string
+      total_price:
+        type: number
+      user_id:
+        type: integer
+    required:
+    - check_in_date
+    - check_out_date
+    type: object
+  model.BookingResponse:
+    properties:
+      booking:
+        $ref: '#/definitions/model.Booking'
+      invoice:
+        $ref: '#/definitions/model.Invoice'
+    type: object
+  model.BookingSuccessResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.BookingResponse'
+      status:
+        type: string
+    type: object
+  model.Invoice:
+    properties:
+      amount:
+        type: number
+      booking_id:
+        type: integer
+      invoice_url:
+        type: string
+      status:
+        type: string
+      xendit_invoice_id:
+        type: string
+    required:
+    - amount
+    - booking_id
+    - xendit_invoice_id
+    type: object
+  model.LoginResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+    type: object
+  model.RegisterSuccessResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.User'
+      status:
+        type: string
+    type: object
+  model.User:
+    properties:
+      email:
+        type: string
+      id:
+        description: gorm.Model
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/model.UserRoleEnum'
+        enum:
+        - customer
+        - hotel_owner
+    required:
+    - email
+    - name
+    - phone
+    - role
+    type: object
+  model.UserRoleEnum:
+    enum:
+    - customer
+    - hotel_owner
+    type: string
+    x-enum-varnames:
+    - Customer
+    - HotelOwner
+  utils.APIError:
+    properties:
+      detail:
+        type: string
+      error_code:
+        type: string
+      message: {}
+    type: object
+externalDocs:
+  description: Github
+  url: https://github.com/iqbalutomo
+host: fc76-103-18-34-211.ngrok-free.app
+info:
+  contact:
+    email: muhlisiqbalutomo@gmail.com
+    name: API Support
+  description: This is API for booking hotel with Xendit payment gateway
+  license:
+    name: MIT License
+    url: https://github.com/iqbalutomo/staycation/blob/master/LICENSE
+  termsOfService: https://github.com/iqbalutomo/staycation
+  title: Staycation API
+  version: 0.0.1
+paths:
+  /bookings:
+    post:
+      consumes:
+      - application/json
+      description: Book room from hotel
+      parameters:
+      - description: Booking details
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/model.Booking'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/model.BookingSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Booking Room
+      tags:
+      - Booking
+  /users/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Deposit your balance for book room from hotel
+      parameters:
+      - description: Deposit amount
+        in: query
+        name: amount
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Top Up Balance
+      tags:
+      - User
+  /users/login:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Login user for consume feature of API
+      parameters:
+      - in: formData
+        name: email
+        required: true
+        type: string
+      - in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/model.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      summary: Login User
+      tags:
+      - User
+  /users/register:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Register a new user
+      parameters:
+      - in: formData
+        name: email
+        required: true
+        type: string
+      - in: formData
+        name: name
+        required: true
+        type: string
+      - in: formData
+        name: password
+        required: true
+        type: string
+      - in: formData
+        name: phone
+        required: true
+        type: string
+      - enum:
+        - customer
+        - hotel_owner
+        in: formData
+        name: role
+        required: true
+        type: string
+        x-enum-varnames:
+        - Customer
+        - HotelOwner
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/model.RegisterSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      summary: Register User
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

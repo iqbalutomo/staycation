@@ -2,11 +2,13 @@ package model
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Booking struct {
-	// gorm.Model
-	ID           uint      `gorm:"primaryKey" json:"id"`
+	// ID           uint      `gorm:"primaryKey" json:"id"`
+	gorm.Model
 	UserID       uint      `gorm:"not null" json:"user_id"`
 	HotelID      uint      `gorm:"not null" json:"hotel_id"`
 	RoomID       uint      `gorm:"not null" json:"room_id"`
@@ -31,8 +33,8 @@ type Invoice struct {
 }
 
 type Payment struct {
-	// gorm.Model
-	ID            uint      `gorm:"primaryKey" json:"id"`
+	// ID            uint      `gorm:"primaryKey" json:"id"`
+	gorm.Model
 	InvoiceID     uint      `gorm:"not null" json:"invoice_id" validate:"required"`
 	PaymentMethod string    `gorm:"not null" json:"payment_method" validate:"required"`
 	PaidAmount    float64   `gorm:"not null" json:"paid_amount" validate:"required"`
@@ -44,4 +46,36 @@ type Payment struct {
 type BookingResponse struct {
 	Booking *Booking `json:"booking"`
 	Invoice *Invoice `json:"invoice"`
+}
+
+// swagger resp
+type BookingSuccessResponse struct {
+	Status string          `json:"status"`
+	Data   BookingResponse `json:"data"`
+}
+
+// for test
+type BookingTest struct {
+	ID           uint      `gorm:"primaryKey" json:"id"`
+	UserID       uint      `gorm:"not null" json:"user_id"`
+	HotelID      uint      `gorm:"not null" json:"hotel_id"`
+	RoomID       uint      `gorm:"not null" json:"room_id"`
+	CheckInDate  time.Time `gorm:"not null" json:"check_in_date" validate:"required"`
+	CheckOutDate time.Time `gorm:"not null" json:"check_out_date" validate:"required"`
+	TotalPrice   float64   `gorm:"not null" json:"total_price"`
+	Status       string    `gorm:"type:booking_status_enum;default:'booked'"`
+
+	User  User  `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
+	Hotel Hotel `gorm:"foreignKey:HotelID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
+	Room  Room  `gorm:"foreignKey:RoomID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
+}
+
+type PaymentTest struct {
+	ID            uint      `gorm:"primaryKey" json:"id"`
+	InvoiceID     uint      `gorm:"not null" json:"invoice_id" validate:"required"`
+	PaymentMethod string    `gorm:"not null" json:"payment_method" validate:"required"`
+	PaidAmount    float64   `gorm:"not null" json:"paid_amount" validate:"required"`
+	PaidAt        time.Time `gorm:"not null" json:"paid_at"`
+
+	Invoice Invoice `gorm:"foreignKey:InvoiceID;constraint:OnDelete:CASCADE;" json:"-" validate:"-"`
 }

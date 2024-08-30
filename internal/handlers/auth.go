@@ -19,6 +19,17 @@ func NewAuthHandler(service service.AuthService) *authHandler {
 	return &authHandler{service: service}
 }
 
+// ShowAccount godoc
+// @Summary      Register User
+// @Description  Register a new user
+// @Tags        User
+// @Accept       x-www-form-urlencoded
+// @Produce      json
+// @Param       user formData model.UserRegisterRequest true "User registration details"
+// @Success      201  {object}  model.RegisterSuccessResponse "Success"
+// @Failure      400  {object}  utils.APIError
+// @Failure      500  {object}  utils.APIError
+// @Router       /users/register [post]
 func (h *authHandler) Register(c echo.Context) error {
 	name := c.FormValue("name")
 	email := c.FormValue("email")
@@ -64,6 +75,18 @@ func (h *authHandler) Register(c echo.Context) error {
 	})
 }
 
+// ShowAccount godoc
+// @Summary      Login User
+// @Description  Login user for consume feature of API
+// @Tags         User
+// @Accept       x-www-form-urlencoded
+// @Produce      json
+// @Param       user formData model.UserLoginRequest true "User login details"
+// @Success      200  {object}  model.LoginResponse "Success"
+// @Failure      400  {object}  utils.APIError
+// @Failure 	401 {object} utils.APIError "Unauthorized"
+// @Failure      500  {object}  utils.APIError
+// @Router       /users/login [post]
 func (h *authHandler) Login(c echo.Context) error {
 	email := c.FormValue("email")
 	password := c.FormValue("password")

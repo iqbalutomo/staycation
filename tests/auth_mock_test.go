@@ -12,24 +12,24 @@ type UserRepoMock struct {
 	mock.Mock
 }
 
-func (m *UserRepoMock) Create(user *model.User) error {
+func (m *UserRepoMock) Create(user *model.UserTest) error {
 	args := m.Called(user)
 	return args.Error(0)
 }
 
-func (m *UserRepoMock) FindByEmail(email string) (*model.User, error) {
+func (m *UserRepoMock) FindByEmail(email string) (*model.UserTest, error) {
 	args := m.Called(email)
-	return args.Get(0).(*model.User), args.Error(1)
+	return args.Get(0).(*model.UserTest), args.Error(1)
 }
 
-func (m *UserRepoMock) FindByPhone(phone string) (*model.User, error) {
+func (m *UserRepoMock) FindByPhone(phone string) (*model.UserTest, error) {
 	args := m.Called(phone)
-	return args.Get(0).(*model.User), args.Error(1)
+	return args.Get(0).(*model.UserTest), args.Error(1)
 }
 
 func TestCreateUser(t *testing.T) {
 	userRepoMock := new(UserRepoMock)
-	user := &model.User{
+	user := &model.UserTest{
 		ID:       1,
 		Email:    "test@example.com",
 		Password: "hashedpassword",
@@ -43,7 +43,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestFindByEmail(t *testing.T) {
 	userRepoMock := new(UserRepoMock)
-	user := &model.User{
+	user := &model.UserTest{
 		ID:       1,
 		Email:    "test@example.com",
 		Password: "hashedpassword",
@@ -59,7 +59,7 @@ func TestFindByEmail(t *testing.T) {
 
 func TestFindByPhone(t *testing.T) {
 	userRepoMock := new(UserRepoMock)
-	user := &model.User{
+	user := &model.UserTest{
 		ID:       1,
 		Phone:    "1234567890",
 		Password: "hashedpassword",

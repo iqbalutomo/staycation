@@ -8,11 +8,34 @@ import (
 	service "staycation/internal/services"
 	"staycation/pkg/utils"
 
+	_ "staycation/docs"
+
+	echoSwagger "github.com/swaggo/echo-swagger"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
+// @title           Staycation API
+// @version         0.0.1
+// @description     This is API for booking hotel with Xendit payment gateway
+// @termsOfService  https://github.com/iqbalutomo/staycation
+
+// @contact.name   API Support
+// @contact.email  muhlisiqbalutomo@gmail.com
+
+// @license.name  MIT License
+// @license.url   https://github.com/iqbalutomo/staycation/blob/master/LICENSE
+
+// @host      fc76-103-18-34-211.ngrok-free.app
+
+// @securityDefinitions.apiKey  BearerAuth
+// @in header
+// @name Authorization
+
+// @externalDocs.description  Github
+// @externalDocs.url          https://github.com/iqbalutomo
 func main() {
 	config.InitConfig()
 
@@ -36,6 +59,7 @@ func main() {
 			"message": "Welcome staycation API bruh..",
 		})
 	})
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	route.MainRouter(e)
 

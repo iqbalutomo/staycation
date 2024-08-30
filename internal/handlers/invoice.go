@@ -18,6 +18,19 @@ func NewInvoiceHandler(service service.InvoiceService) *InvoiceHandler {
 	return &InvoiceHandler{Service: service}
 }
 
+// ShowAccount godoc
+// @Summary      Booking Room
+// @Description  Book room from hotel
+// @Tags         Booking
+// @Accept       json
+// @Produce      json
+// @Param       booking body model.Booking true "Booking details"
+// @Success      200  {object}  model.BookingSuccessResponse "Success"
+// @Failure      400  {object}  utils.APIError
+// @Failure      404  {object}  utils.APIError
+// @Failure      500  {object}  utils.APIError
+// @Security BearerAuth
+// @Router       /bookings [post]
 func (h *InvoiceHandler) BookRoom(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
 	userID := uint(userClaims["user_id"].(float64))

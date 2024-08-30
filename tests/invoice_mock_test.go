@@ -14,19 +14,19 @@ type InvoiceRepoMock struct {
 	mock.Mock
 }
 
-func (m *InvoiceRepoMock) CreateBooking(booking *model.Booking) error {
+func (m *InvoiceRepoMock) CreateBooking(booking *model.BookingTest) error {
 	args := m.Called(booking)
 	return args.Error(0)
 }
 
-func (m *InvoiceRepoMock) FindBookingByID(id uint) (*model.Booking, error) {
+func (m *InvoiceRepoMock) FindBookingByID(id uint) (*model.BookingTest, error) {
 	args := m.Called(id)
-	return args.Get(0).(*model.Booking), args.Error(1)
+	return args.Get(0).(*model.BookingTest), args.Error(1)
 }
 
-func (m *InvoiceRepoMock) FindByRoomAndDate(roomID uint, checkInDate, checkOutDate time.Time) ([]model.Booking, error) {
+func (m *InvoiceRepoMock) FindByRoomAndDate(roomID uint, checkInDate, checkOutDate time.Time) ([]model.BookingTest, error) {
 	args := m.Called(roomID, checkInDate, checkOutDate)
-	return args.Get(0).([]model.Booking), args.Error(1)
+	return args.Get(0).([]model.BookingTest), args.Error(1)
 }
 
 func (m *InvoiceRepoMock) CreateInvoice(invoice *model.Invoice) error {
@@ -44,14 +44,14 @@ func (m *InvoiceRepoMock) UpdateInvoiceStatus(id uint, status string) error {
 	return args.Error(0)
 }
 
-func (m *InvoiceRepoMock) CreatePayment(payment *model.Payment) error {
+func (m *InvoiceRepoMock) CreatePayment(payment *model.PaymentTest) error {
 	args := m.Called(payment)
 	return args.Error(0)
 }
 
 func TestCreateBooking(t *testing.T) {
 	repo := new(InvoiceRepoMock)
-	booking := &model.Booking{
+	booking := &model.BookingTest{
 		ID: 1,
 	}
 
@@ -65,7 +65,7 @@ func TestCreateBooking(t *testing.T) {
 
 func TestFindBookingByID(t *testing.T) {
 	repo := new(InvoiceRepoMock)
-	booking := &model.Booking{
+	booking := &model.BookingTest{
 		ID: 1,
 	}
 
@@ -82,7 +82,7 @@ func TestFindByRoomAndDate(t *testing.T) {
 	repo := new(InvoiceRepoMock)
 	checkInDate := time.Date(2024, time.August, 30, 14, 0, 0, int(time.Second), time.Local)
 	checkOutDate := time.Date(2024, time.August, 31, 12, 0, 0, int(time.Second), time.Local)
-	bookings := []model.Booking{
+	bookings := []model.BookingTest{
 		{ID: 1},
 	}
 
@@ -137,7 +137,7 @@ func TestUpdateInvoiceStatus(t *testing.T) {
 
 func TestCreatePayment(t *testing.T) {
 	repo := new(InvoiceRepoMock)
-	payment := &model.Payment{
+	payment := &model.PaymentTest{
 		ID: 1,
 	}
 

@@ -18,6 +18,18 @@ func NewBalanceHandler(service service.BalanceService) *balanceHandler {
 	return &balanceHandler{service}
 }
 
+// ShowAccount godoc
+// @Summary      Top Up Balance
+// @Description  Deposit your balance for book room from hotel
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Param       amount query float64 true "Deposit amount"
+// @Success      200  {object}  map[string]interface{} "Success"
+// @Failure      400  {object}  utils.APIError
+// @Failure      500  {object}  utils.APIError
+// @Security BearerAuth
+// @Router       /users/deposit [post]
 func (h *balanceHandler) TopUp(c echo.Context) error {
 	userClaims := c.Get("user").(jwt.MapClaims)
 	userID := userClaims["user_id"].(float64)
