@@ -1,7 +1,5 @@
 package model
 
-import "gorm.io/gorm"
-
 type UserRoleEnum string
 
 const (
@@ -10,8 +8,8 @@ const (
 )
 
 type User struct {
-	// ID       uint         `gorm:"primaryKey" json:"id"`
-	gorm.Model
+	// gorm.Model
+	ID       uint         `gorm:"primaryKey" json:"id"`
 	Name     string       `gorm:"size:100;not null" json:"name" validate:"required"`
 	Email    string       `gorm:"size:100;unique;not null" json:"email" validate:"required,email"`
 	Password string       `gorm:"size:60;not null" json:"-" validate:"required"`
