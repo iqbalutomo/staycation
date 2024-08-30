@@ -9,9 +9,14 @@ import (
 )
 
 var (
-	Port         string
-	XenditAPIKey string
-	XenditAPIURL string
+	Port           string
+	AppURL         string
+	XenditAPIKey   string
+	XenditAPIURL   string
+	MailtrapAPIKey string
+	MailtrapAPIURL string
+	MailtrapSender string
+	MailtrapName   string
 )
 
 func LoadEnv() error {
@@ -34,6 +39,11 @@ func InitConfig() {
 	}
 
 	Port = port
+	AppURL = os.Getenv("APP_URL")
 	XenditAPIKey = os.Getenv("XENDIT_API_KEY")
 	XenditAPIURL = os.Getenv("XENDIT_API_URL")
+	MailtrapAPIKey = os.Getenv("MAILTRAP_API_KEY")
+	MailtrapAPIURL = os.Getenv("MAILTRAP_API_URL")
+	MailtrapSender = os.Getenv("MAILTRAP_SENDER")
+	MailtrapName = os.Getenv("MAILTRAP_NAME")
 }

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	model "staycation/internal/models"
 	service "staycation/internal/services"
+
+	email_mailtrap "staycation/pkg/third_parties/mailtrap/email"
 	"staycation/pkg/utils"
 
 	"github.com/labstack/echo/v4"
@@ -49,6 +51,10 @@ func (h *authHandler) Register(c echo.Context) error {
 		if err.Error() == "phone_exist" {
 			return utils.HandleError(c, utils.NewBadRequestError(utils.RegisteerPhoneExist, "phone number already exist."))
 		}
+		return utils.HandleError(c, utils.NewInternalError(utils.RegisterInternalErr, err.Error()))
+	}
+
+	if err := email_mailtrap.SendEmailRegister(formData.Email, formData.Name); err != nil {
 		return utils.HandleError(c, utils.NewInternalError(utils.RegisterInternalErr, err.Error()))
 	}
 
